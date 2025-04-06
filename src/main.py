@@ -20,6 +20,22 @@ def setup_environment():
     os.environ["QT_SCALE_FACTOR_ROUNDING_POLICY"] = "PassThrough"
     os.environ["QT_AUTO_SCREEN_SCALE_FACTOR"] = "1"
     
+    QCoreApplication.setAttribute(Qt.AA_EnableHighDpiScaling)
+    QCoreApplication.setAttribute(Qt.AA_UseHighDpiPixmaps)
+    QCoreApplication.setAttribute(Qt.AA_ShareOpenGLContexts)
+    
+    # Configure certificate handling
+    os.environ["QTWEBENGINE_CHROMIUM_FLAGS"] = (
+        "--ignore-certificate-errors "
+        "--ignore-ssl-errors "
+        "--disable-web-security "
+        "--no-sandbox "
+        "--use-angle=d3d11 "
+        "--enable-features=UseOzonePlatform "
+        "--ozone-platform=windows "
+        "--in-process-gpu"
+    )
+    
     # Cyberpunk theme colors
     extra = {
         'density_scale': '-2',
@@ -36,24 +52,12 @@ def setup_environment():
     
     # WebEngine setup
     os.environ["QTWEBENGINE_DISABLE_SANDBOX"] = "1"
-    os.environ["QTWEBENGINE_CHROMIUM_FLAGS"] = (
-        "--no-sandbox "
-        "--use-angle=d3d11 "
-        "--enable-features=UseOzonePlatform "
-        "--ozone-platform=windows "
-        "--in-process-gpu "
-        "--ignore-certificate-errors"
-    )
-    
-    # Set Qt attributes
-    QCoreApplication.setAttribute(Qt.AA_ShareOpenGLContexts)
-    QCoreApplication.setAttribute(Qt.AA_EnableHighDpiScaling)
     
     return extra
 
 def main():
     try:
-        # Setup environment first
+        # Setup environment first - before QApplication
         extra = setup_environment()
         
         logger.info("Starting browser application...")
