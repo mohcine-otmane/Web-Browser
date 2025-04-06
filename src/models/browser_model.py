@@ -15,68 +15,84 @@ class BrowserModel(QObject):
     settings_changed = Signal(dict)
     bookmarks_changed = Signal(list)
     
-    def __init__(self):
-        super().__init__()
-        self.current_url = ""
-        self.current_title = ""
-        self.settings = DEFAULT_SETTINGS.copy()
-        self.bookmarks = []
+    def __init__(self, parent=None):
+        """Initialize the browser model with proper parent ownership."""
+        super().__init__(parent)
+        self._url = ""
+        self._title = ""
+        self._settings = DEFAULT_SETTINGS.copy()
+        self._bookmarks = []
         self.load_settings()
         self.load_bookmarks()
     
     def set_url(self, url):
-        self.current_url = url
-        self.url_changed.emit(url)
+        """Set the current URL and emit the change signal."""
+        if self._url != url:
+            self._url = url
+            self.url_changed.emit(url)
     
     def set_title(self, title):
-        self.current_title = title
-        self.title_changed.emit(title)
+        """Set the current title and emit the change signal."""
+        if self._title != title:
+            self._title = title
+            self.title_changed.emit(title)
     
     def show_status_message(self, message):
+        """Show a status message."""
         self.status_message.emit(message)
+    
+    @property
+    def current_url(self):
+        """Get the current URL."""
+        return self._url
+    
+    @property
+    def current_title(self):
+        """Get the current title."""
+        return self._title
     
     def load_settings(self):
         # Load settings from QSettings
         settings = QSettings()
         for key, default_value in DEFAULT_SETTINGS.items():
-            self.settings[key] = settings.value(key, default_value)
+            self._settings[key] = settings.value(key, default_value)
         
         # Ensure download path exists
-        os.makedirs(self.settings["download_path"], exist_ok=True)
+        os.makedirs(self._settings["download_path"], exist_ok=True)
     
     def save_settings(self):
         # Save settings to QSettings
         settings = QSettings()
-        for key, value in self.settings.items():
+        for key, value in self._settings.items():
             settings.setValue(key, value)
         settings.sync()
-        self.settings_changed.emit(self.settings)
+        self.settings_changed.emit(self._settings)
     
     def update_setting(self, key, value):
-        if key in self.settings:
-            self.settings[key] = value
+        if key in self._settings:
+            self._settings[key] = value
             self.save_settings()
     
     def load_bookmarks(self):
         # Load bookmarks from QSettings
         settings = QSettings()
-        self.bookmarks = settings.value("bookmarks", [])
+        self._bookmarks = settings.value("bookmarks", [])
     
     def save_bookmarks(self):
         # Save bookmarks to QSettings
         settings = QSettings()
-        settings.setValue("bookmarks", self.bookmarks)
+        settings.setValue("bookmarks", self._bookmarks)
         settings.sync()
-        self.bookmarks_changed.emit(self.bookmarks)
+        self.bookmarks_changed.emit(self._bookmarks)
     
     def add_bookmark(self, title, url):
         # Check if bookmark already exists
-        for bookmark in self.bookmarks:
+        for bookmark in self._bookmarks:
             if bookmark["url"] == url:
                 return False
         
         # Add new bookmark
-        self.bookmarks.append({
+        self._bookmarks.append({
             "title": title,
             "url": url
         })
@@ -85,9 +101,9 @@ class BrowserModel(QObject):
     
     def remove_bookmark(self, url):
         # Remove bookmark if it exists
-        for i, bookmark in enumerate(self.bookmarks):
+        for i, bookmark in enumerate(self._bookmarks):
             if bookmark["url"] == url:
-                del self.bookmarks[i]
+                del self._bookmarks[i]
                 self.save_bookmarks()
                 return True
         return False

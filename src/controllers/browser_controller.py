@@ -4,7 +4,7 @@ from PySide6.QtCore import QObject, QUrl, QStandardPaths, QSettings, Qt, Signal
 from PySide6.QtNetwork import QNetworkProxy
 from PySide6.QtWidgets import (QMessageBox, QDialog, QVBoxLayout, QHBoxLayout,
                              QLineEdit, QListWidget, QListWidgetItem, QPushButton)
-from PySide6.QtWebEngineCore import QWebEngineProfile, QWebEngineDownloadRequest, QWebEnginePage
+from PySide6.QtWebEngineCore import QWebEngineProfile, QWebEngineDownloadRequest, QWebEnginePage, QWebEngineSettings
 from models.browser_model import BrowserModel
 from views.dialogs import (SettingsDialog, CacheSettingsDialog, ProxyDialog, 
                          BookmarksDialog, AddBookmarkDialog, DownloadDialog,
@@ -19,7 +19,10 @@ if TYPE_CHECKING:
 class BrowserController(QObject):
     def __init__(self):
         super().__init__()
+        # Create model with this controller as parent to ensure proper lifecycle
         self.model = BrowserModel()
+        self.model.setParent(self)
+        
         self.view = None  # Will be set after BrowserWindow is created
         self.settings = self.load_settings()
         self.bookmarks = self.load_bookmarks()
@@ -36,13 +39,53 @@ class BrowserController(QObject):
         # Setup cache
         self.setup_cache()
         
+        # Setup browser profile
+        self.setup_browser_profile()
+        
         # Apply proxy settings
         self.apply_proxy_settings()
     
+    def get_theme_colors(self):
+        """Get the theme colors for the browser UI."""
+        return {
+            'primary': '#2563eb',
+            'primary_hover': '#1d4ed8',
+            'primary_pressed': '#1e40af',
+            'background': '#ffffff',
+            'surface': '#f8fafc',
+            'border': '#e2e8f0',
+            'text': '#000000',
+            'text_secondary': '#000000',
+            'accent': '#f59e0b',
+            'danger': '#ef4444',
+            'success': '#10b981',
+            'shadow': 'rgba(0, 0, 0, 0.1)'
+        }
+    
     def set_view(self, view: 'BrowserWindow'):
+        """Set the view and initialize it."""
         self.view = view
+        
         # Add initial tab after view is set
         self.new_tab()
+        
+        # Connect model signals to view using more robust connection
+        if self.model:
+            try:
+                self.model.url_changed.connect(
+                    self.view.update_url_bar,
+                    type=Qt.QueuedConnection  # Use queued connection
+                )
+                self.model.title_changed.connect(
+                    lambda title: self.view.setWindowTitle(f"{title} - SandFlea"),
+                    type=Qt.QueuedConnection
+                )
+                self.model.status_message.connect(
+                    self.view.status_bar.showMessage,
+                    type=Qt.QueuedConnection
+                )
+            except Exception as e:
+                print(f"Error connecting signals: {str(e)}")
     
     def setup_cache(self):
         # Get or create cache directory
@@ -56,6 +99,34 @@ class BrowserController(QObject):
         profile.setCachePath(cache_path)
         profile.setHttpCacheMaximumSize(cache_size)
         profile.setPersistentCookiesPolicy(QWebEngineProfile.ForcePersistentCookies)
+    
+    def setup_browser_profile(self):
+        profile = QWebEngineProfile.defaultProfile()
+        settings = profile.settings()
+        
+        # Basic settings with hardware acceleration disabled
+        settings.setAttribute(QWebEngineSettings.WebAttribute.JavascriptEnabled, True)
+        settings.setAttribute(QWebEngineSettings.WebAttribute.LocalStorageEnabled, True)
+        settings.setAttribute(QWebEngineSettings.WebAttribute.ScrollAnimatorEnabled, True)
+        settings.setAttribute(QWebEngineSettings.WebAttribute.FullScreenSupportEnabled, True)
+        settings.setAttribute(QWebEngineSettings.WebAttribute.WebGLEnabled, False)  # Disable WebGL
+        settings.setAttribute(QWebEngineSettings.WebAttribute.LocalContentCanAccessRemoteUrls, True)
+        settings.setAttribute(QWebEngineSettings.WebAttribute.ErrorPageEnabled, True)
+        settings.setAttribute(QWebEngineSettings.WebAttribute.ShowScrollBars, True)
+        settings.setAttribute(QWebEngineSettings.WebAttribute.AllowRunningInsecureContent, False)
+        
+        # Content settings
+        profile.setHttpCacheType(QWebEngineProfile.MemoryHttpCache)
+        profile.setPersistentCookiesPolicy(QWebEngineProfile.NoPersistentCookies)
+        profile.setHttpAcceptLanguage("en-US,en;q=0.9")
+        
+        # Custom user agent
+        profile.setHttpUserAgent(
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+            "AppleWebKit/537.36 (KHTML, like Gecko) "
+            "Chrome/121.0.0.0 Safari/537.36 "
+            "SandFlea/1.0"
+        )
     
     def update_cache_settings(self):
         cache_path = self.settings.get("cache_path", 
@@ -114,8 +185,33 @@ class BrowserController(QObject):
         self.view.update_tab_title(tab, title)
     
     def update_tab_url(self, tab, url):
-        self.view.update_url_bar(url)
-        self.model.set_url(url.toString())
+        """Update the URL bar and model with the new URL.
+        
+        Args:
+            tab: The tab being updated
+            url: QUrl object or string representing the new URL
+        """
+        if not self.view:
+            return
+            
+        try:
+            # Convert to string if it's a QUrl
+            url_str = url.toString() if hasattr(url, 'toString') else str(url)
+            
+            # Update UI first
+            self.view.update_url_bar(url_str)
+            
+            # Then update model
+            if not self.model:
+                return
+                
+            self.model.set_url(url_str)
+            
+        except RuntimeError as e:
+            # Log error but don't crash
+            print(f"Error updating URL: {str(e)}")
+        except Exception as e:
+            print(f"Unexpected error updating URL: {str(e)}")
     
     def back(self):
         current_tab = self.view.get_current_tab()
@@ -149,8 +245,19 @@ class BrowserController(QObject):
     def load_started(self):
         self.view.status_bar.showMessage("Loading...")
     
-    def show_status_message(self, message, timeout=3000):
-        self.view.status_bar.showMessage(message, timeout)
+    def show_status_message(self, message: str, timeout=3000, urgency="normal"):
+        """Show a status message with specified urgency level.
+        
+        Args:
+            message: The message to display
+            timeout: How long to show the message (in ms)
+            urgency: One of "normal", "high", "success"
+        """
+        if self.view:
+            self.view.status_bar.setProperty("urgency", urgency)
+            self.view.status_bar.showMessage(message, timeout)
+            self.view.status_bar.style().unpolish(self.view.status_bar)
+            self.view.status_bar.style().polish(self.view.status_bar)
     
     def show_settings(self):
         dialog = SettingsDialog(self.view)
@@ -267,7 +374,10 @@ class BrowserController(QObject):
     
     def _on_download_progress(self, filename: str, progress: int):
         """Handle download progress updates."""
-        self.view.show_status_message(f"Downloading {filename}: {progress}%")
+        self.show_status_message(
+            f"Downloading {filename}: {progress}%",
+            urgency="normal"
+        )
         if self.download_manager:
             for download_id, info in self.downloader.active_downloads.items():
                 if info['filename'] == filename:
@@ -277,7 +387,11 @@ class BrowserController(QObject):
     def _on_download_finished(self, filename: str, success: bool):
         """Handle download completion."""
         status = "Completed" if success else "Cancelled"
-        self.view.show_status_message(f"Download {status.lower()}: {filename}")
+        urgency = "success" if success else "high"
+        self.show_status_message(
+            f"Download {status.lower()}: {filename}",
+            urgency=urgency
+        )
         if self.download_manager:
             for download_id, info in self.downloader.active_downloads.items():
                 if info['filename'] == filename:
@@ -286,7 +400,10 @@ class BrowserController(QObject):
     
     def _on_download_error(self, filename: str, error: str):
         """Handle download errors."""
-        self.view.show_status_message(f"Download failed: {filename}")
+        self.show_status_message(
+            f"Download failed: {filename}",
+            urgency="high"
+        )
         self.show_error("Download Error", error)
         if self.download_manager:
             for download_id, info in self.downloader.active_downloads.items():
@@ -320,7 +437,11 @@ class BrowserController(QObject):
             qurl = QUrl.fromUserInput(url)
             self.navigate_to_url(qurl)
         except Exception as e:
-            self.view.status_bar.showMessage(f"Error loading page: {str(e)}", 3000)
+            self.show_status_message(
+                f"Error loading page: {str(e)}", 
+                3000,
+                urgency="high"
+            )
     
     def apply_proxy_settings(self):
         settings = QSettings()
@@ -343,4 +464,4 @@ class BrowserController(QObject):
             proxy.setUser(settings.value("proxy/username", ""))
             proxy.setPassword(settings.value("proxy/password", ""))
         
-        QNetworkProxy.setApplicationProxy(proxy) 
+        QNetworkProxy.setApplicationProxy(proxy)
