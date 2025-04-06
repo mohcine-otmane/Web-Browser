@@ -192,16 +192,50 @@ class BrowserController(QObject):
             self.download_manager = DownloadManagerDialog(self.view)
         self.download_manager.show()
     
+    def show_error(self, title: str, message: str):
+        """Show an error message box."""
+        if self.view and not self.view.isHidden():
+            self.view.status_bar.showMessage(message, 3000)
+            QMessageBox(
+                QMessageBox.Critical,
+                title,
+                message,
+                QMessageBox.Ok,
+                self.view
+            ).exec()
+        else:
+            QMessageBox(
+                QMessageBox.Critical,
+                title,
+                message,
+                QMessageBox.Ok,
+                None
+            ).exec()
+    
     def handle_download(self, download: QWebEngineDownloadRequest):
         try:
             # Get the download URL and suggested filename
             url = download.url().toString()
             suggested_filename = download.suggestedFileName()
             if not suggested_filename:
-                suggested_filename = "download"
+                suggested_filename = os.path.basename(url) or "download"
             
-            # Create download dialog
+            # Get default download path from settings
+            default_path = self.settings.get("download_path", 
+                QStandardPaths.writableLocation(QStandardPaths.DownloadLocation))
+            
+            # Ensure default download directory exists
+            try:
+                os.makedirs(default_path, exist_ok=True)
+            except Exception as e:
+                self.show_error("Download Error", f"Failed to create download directory: {str(e)}")
+                download.cancel()
+                return
+            
+            # Create download dialog with default path
             dialog = DownloadDialog(url, self.view)
+            dialog.set_default_path(os.path.join(default_path, suggested_filename))
+            
             if dialog.exec() != QDialog.Accepted:
                 download.cancel()
                 return
@@ -209,6 +243,7 @@ class BrowserController(QObject):
             # Get the selected save path
             save_path = dialog.get_save_path()
             if not save_path:
+                self.show_error("Download Error", "No save path selected")
                 download.cancel()
                 dialog.close()
                 return
@@ -224,12 +259,7 @@ class BrowserController(QObject):
             
         except Exception as e:
             error_msg = f"Failed to start download: {str(e)}"
-            QMessageBox.critical(
-                self.view,
-                "Download Error",
-                error_msg
-            )
-            self.view.show_status_message(error_msg)
+            self.show_error("Download Error", error_msg)
             if download:
                 download.cancel()
             if 'dialog' in locals():
@@ -256,13 +286,8 @@ class BrowserController(QObject):
     
     def _on_download_error(self, filename: str, error: str):
         """Handle download errors."""
-        error_msg = f"Download error ({filename}): {error}"
-        self.view.show_status_message(error_msg)
-        QMessageBox.critical(
-            self.view,
-            "Download Error",
-            error_msg
-        )
+        self.view.show_status_message(f"Download failed: {filename}")
+        self.show_error("Download Error", error)
         if self.download_manager:
             for download_id, info in self.downloader.active_downloads.items():
                 if info['filename'] == filename:

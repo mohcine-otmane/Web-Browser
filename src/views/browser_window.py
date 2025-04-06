@@ -20,135 +20,182 @@ class BrowserWindow(QMainWindow):
         self.setWindowTitle("Web Browser")
         self.setMinimumSize(1024, 768)
         
+        # Define color scheme
+        colors = {
+            'primary': '#2563eb',  # Modern blue
+            'primary_hover': '#1d4ed8',
+            'primary_pressed': '#1e40af',
+            'background': '#ffffff',
+            'surface': '#f8fafc',
+            'border': '#e2e8f0',
+            'text': '#1e293b',
+            'text_secondary': '#64748b',
+            'accent': '#f59e0b',
+            'danger': '#ef4444',
+            'success': '#10b981'
+        }
+        
         # Apply modern style
-        self.setStyleSheet("""
-            QMainWindow {
-                background-color: #ffffff;
-            }
-            QToolBar {
-                background-color: #f8f8f8;
-                border-bottom: 1px solid #e0e0e0;
-                spacing: 8px;
-                padding: 8px;
-            }
-            QToolButton {
+        self.setStyleSheet(f"""
+            QMainWindow {{
+                background-color: {colors['background']};
+            }}
+            QToolBar {{
+                background-color: {colors['surface']};
+                border-bottom: 1px solid {colors['border']};
+                spacing: 10px;
+                padding: 10px;
+            }}
+            QToolButton, QPushButton[flat="true"] {{
                 background-color: transparent;
                 border: none;
-                padding: 6px;
-                min-width: 32px;
-                min-height: 32px;
-                border-radius: 4px;
-            }
-            QToolButton:hover {
-                background-color: #e6f2fa;
-            }
-            QToolButton:pressed {
-                background-color: #cce4f7;
-            }
-            QLineEdit {
-                border: 1px solid #e0e0e0;
-                border-radius: 4px;
-                padding: 6px 8px;
-                background-color: #ffffff;
-                min-height: 32px;
-                selection-background-color: #0078d4;
+                padding: 8px;
+                min-width: 36px;
+                min-height: 36px;
+                border-radius: 8px;
+                font-size: 16px;
+                color: {colors['text']};
+            }}
+            QToolButton:hover, QPushButton[flat="true"]:hover {{
+                background-color: {colors['primary']}20;
+                color: {colors['primary']};
+            }}
+            QToolButton:pressed, QPushButton[flat="true"]:pressed {{
+                background-color: {colors['primary']}30;
+            }}
+            QLineEdit {{
+                border: 2px solid {colors['border']};
+                border-radius: 8px;
+                padding: 8px 12px;
+                background-color: {colors['background']};
+                min-height: 36px;
+                selection-background-color: {colors['primary']};
                 selection-color: white;
-                color: #333333;
+                color: {colors['text']};
                 font-size: 14px;
-            }
-            QLineEdit:focus {
-                border-color: #0078d4;
-                background-color: #ffffff;
-                color: #333333;
-            }
-            QLineEdit::placeholder {
-                color: #999999;
-            }
-            QTabWidget::pane {
-                border: 1px solid #e0e0e0;
-                background-color: #ffffff;
-                border-top-left-radius: 4px;
-                border-top-right-radius: 4px;
-            }
-            QTabBar::tab {
-                background-color: #f8f8f8;
-                border: 1px solid #e0e0e0;
+            }}
+            QLineEdit:focus {{
+                border-color: {colors['primary']};
+                background-color: {colors['background']};
+            }}
+            QLineEdit::placeholder {{
+                color: {colors['text_secondary']};
+            }}
+            QTabWidget::pane {{
+                border: 1px solid {colors['border']};
+                background-color: {colors['background']};
+                border-radius: 8px;
+            }}
+            QTabBar::tab {{
+                background-color: {colors['surface']};
+                border: 1px solid {colors['border']};
                 border-bottom: none;
-                border-top-left-radius: 4px;
-                border-top-right-radius: 4px;
-                padding: 8px 16px;
-                margin-right: 2px;
-                color: #666666;
+                border-top-left-radius: 8px;
+                border-top-right-radius: 8px;
+                padding: 10px 20px;
+                margin-right: 4px;
+                color: {colors['text_secondary']};
                 font-size: 13px;
-            }
-            QTabBar::tab:selected {
-                background-color: #ffffff;
-                border-bottom: 1px solid #ffffff;
-                color: #0078d4;
-            }
-            QTabBar::tab:hover:!selected {
-                background-color: #f0f0f0;
-                color: #444444;
-            }
-            QStatusBar {
-                background-color: #f8f8f8;
-                border-top: 1px solid #e0e0e0;
-                color: #666666;
-                font-size: 12px;
-                padding: 4px;
-            }
-            QMenuBar {
-                background-color: #ffffff;
-                border-bottom: 1px solid #e0e0e0;
-                padding: 4px;
-            }
-            QMenuBar::item {
-                padding: 6px 12px;
-                color: #444444;
-                font-size: 13px;
-            }
-            QMenuBar::item:selected {
-                background-color: #f0f0f0;
-                color: #0078d4;
-            }
-            QMenu {
-                background-color: #ffffff;
-                border: 1px solid #e0e0e0;
+            }}
+            QTabBar::tab:selected {{
+                background-color: {colors['background']};
+                border-bottom: 2px solid {colors['primary']};
+                color: {colors['primary']};
+                font-weight: bold;
+            }}
+            QTabBar::tab:hover:!selected {{
+                background-color: {colors['primary']}10;
+                color: {colors['text']};
+            }}
+            QStatusBar {{
+                background-color: {colors['surface']};
+                border-top: 1px solid {colors['border']};
+                color: {colors['text_secondary']};
                 padding: 6px;
-            }
-            QMenu::item {
-                padding: 6px 24px;
-                color: #444444;
+                font-size: 12px;
+            }}
+            QMenuBar {{
+                background-color: {colors['surface']};
+                border-bottom: 1px solid {colors['border']};
+                padding: 6px;
+            }}
+            QMenuBar::item {{
+                padding: 8px 16px;
+                color: {colors['text']};
                 font-size: 13px;
-            }
-            QMenu::item:selected {
-                background-color: #f0f0f0;
-                color: #0078d4;
-            }
-            QPushButton {
-                background-color: #0078d4;
+                border-radius: 6px;
+            }}
+            QMenuBar::item:selected {{
+                background-color: {colors['primary']}20;
+                color: {colors['primary']};
+            }}
+            QMenu {{
+                background-color: {colors['background']};
+                border: 1px solid {colors['border']};
+                border-radius: 8px;
+                padding: 8px;
+            }}
+            QMenu::item {{
+                padding: 8px 24px;
+                color: {colors['text']};
+                font-size: 13px;
+                border-radius: 6px;
+            }}
+            QMenu::item:selected {{
+                background-color: {colors['primary']}20;
+                color: {colors['primary']};
+            }}
+            QPushButton {{
+                background-color: {colors['primary']};
                 color: white;
                 border: none;
-                border-radius: 4px;
-                padding: 8px 16px;
+                border-radius: 8px;
+                padding: 10px 20px;
                 min-width: 80px;
                 font-size: 13px;
-            }
-            QPushButton:hover {
-                background-color: #106ebe;
-            }
-            QPushButton:pressed {
-                background-color: #005a9e;
-            }
-            QPushButton[text="Cancel"] {
-                background-color: #ffffff;
-                color: #444444;
-                border: 1px solid #e0e0e0;
-            }
-            QPushButton[text="Cancel"]:hover {
-                background-color: #f8f8f8;
-                border-color: #d0d0d0;
-            }
+                font-weight: bold;
+            }}
+            QPushButton:hover {{
+                background-color: {colors['primary_hover']};
+            }}
+            QPushButton:pressed {{
+                background-color: {colors['primary_pressed']};
+            }}
+            QPushButton[text="Cancel"] {{
+                background-color: {colors['background']};
+                color: {colors['text']};
+                border: 2px solid {colors['border']};
+            }}
+            QPushButton[text="Cancel"]:hover {{
+                background-color: {colors['surface']};
+                border-color: {colors['text_secondary']};
+            }}
+            
+            /* Navigation Buttons */
+            #nav_button {{
+                font-family: system-ui;
+                font-size: 18px;
+                min-width: 36px;
+                min-height: 36px;
+                border-radius: 8px;
+                background-color: transparent;
+                color: {colors['text']};
+            }}
+            #nav_button:hover {{
+                background-color: {colors['primary']}20;
+                color: {colors['primary']};
+            }}
+            #nav_button:pressed {{
+                background-color: {colors['primary']}30;
+            }}
+            
+            /* Special Buttons */
+            #bookmarks_button {{
+                color: {colors['accent']};
+            }}
+            #downloads_button {{
+                color: {colors['primary']};
+            }}
         """)
         
         self.setup_ui()
@@ -176,23 +223,27 @@ class BrowserWindow(QMainWindow):
         
         # Navigation buttons with modern icons
         back_button = QPushButton("←")
+        back_button.setObjectName("nav_button")
         back_button.setToolTip("Back")
-        back_button.setFixedSize(32, 32)
+        back_button.setFixedSize(36, 36)
         back_button.clicked.connect(self.controller.back)
         
         forward_button = QPushButton("→")
+        forward_button.setObjectName("nav_button")
         forward_button.setToolTip("Forward")
-        forward_button.setFixedSize(32, 32)
+        forward_button.setFixedSize(36, 36)
         forward_button.clicked.connect(self.controller.forward)
         
         refresh_button = QPushButton("↻")
+        refresh_button.setObjectName("nav_button")
         refresh_button.setToolTip("Refresh")
-        refresh_button.setFixedSize(32, 32)
+        refresh_button.setFixedSize(36, 36)
         refresh_button.clicked.connect(self.controller.refresh)
         
         home_button = QPushButton("⌂")
+        home_button.setObjectName("nav_button")
         home_button.setToolTip("Home")
-        home_button.setFixedSize(32, 32)
+        home_button.setFixedSize(36, 36)
         home_button.clicked.connect(self.controller.go_home)
         
         # URL bar with modern style
@@ -201,20 +252,23 @@ class BrowserWindow(QMainWindow):
         self.url_bar.returnPressed.connect(self.handle_url_entered)
         
         # Go button
-        go_button = QPushButton("Go")
-        go_button.setFixedSize(32, 32)
+        go_button = QPushButton("→")
+        go_button.setObjectName("nav_button")
+        go_button.setFixedSize(36, 36)
         go_button.clicked.connect(self.handle_url_entered)
         
         # Bookmarks button
         bookmarks_button = QPushButton("★")
+        bookmarks_button.setObjectName("bookmarks_button")
         bookmarks_button.setToolTip("Bookmarks")
-        bookmarks_button.setFixedSize(32, 32)
+        bookmarks_button.setFixedSize(36, 36)
         bookmarks_button.clicked.connect(self.controller.show_bookmarks)
         
         # Downloads button
         downloads_button = QPushButton("↓")
+        downloads_button.setObjectName("downloads_button")
         downloads_button.setToolTip("Downloads")
-        downloads_button.setFixedSize(32, 32)
+        downloads_button.setFixedSize(36, 36)
         downloads_button.clicked.connect(self.controller.show_download_manager)
         
         # Add widgets to toolbar with proper spacing
