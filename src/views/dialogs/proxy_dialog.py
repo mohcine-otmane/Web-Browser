@@ -7,58 +7,7 @@ class ProxyDialog(QDialog):
         super().__init__(parent)
         self.setWindowTitle("Proxy Settings")
         self.setMinimumWidth(400)
-        
-        # Apply modern style
-        self.setStyleSheet("""
-            QDialog {
-                background-color: #ffffff;
-            }
-            QLabel {
-                color: #444444;
-            }
-            QLineEdit, QComboBox, QSpinBox {
-                border: 1px solid #e0e0e0;
-                border-radius: 4px;
-                padding: 5px;
-                background-color: #ffffff;
-                min-height: 25px;
-            }
-            QLineEdit:focus, QComboBox:focus, QSpinBox:focus {
-                border-color: #0078d4;
-            }
-            QComboBox::drop-down {
-                border: none;
-                width: 20px;
-            }
-            QComboBox::down-arrow {
-                image: url(down_arrow.png);
-                width: 12px;
-                height: 12px;
-            }
-            QPushButton {
-                background-color: #0078d4;
-                color: white;
-                border: none;
-                border-radius: 4px;
-                padding: 8px 16px;
-                min-width: 80px;
-            }
-            QPushButton:hover {
-                background-color: #106ebe;
-            }
-            QPushButton:pressed {
-                background-color: #005a9e;
-            }
-            QPushButton[text="Cancel"] {
-                background-color: #ffffff;
-                color: #444444;
-                border: 1px solid #e0e0e0;
-            }
-            QPushButton[text="Cancel"]:hover {
-                background-color: #f8f8f8;
-                border-color: #d0d0d0;
-            }
-        """)
+        self.setObjectName("ProxyDialog")
         
         layout = QFormLayout(self)
         layout.setSpacing(10)
@@ -120,4 +69,4 @@ class ProxyDialog(QDialog):
         settings.setValue("proxy_host", self.host_edit.text())
         settings.setValue("proxy_port", self.port_edit.value())
         settings.setValue("proxy_username", self.username_edit.text())
-        settings.setValue("proxy_password", self.password_edit.text()) 
+        settings.setValue("proxy_password", self.password_edit.text())

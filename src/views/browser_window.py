@@ -22,57 +22,6 @@ class BrowserWindow(QMainWindow):
         
         # Apply theme colors
         colors = self.controller.get_theme_colors()
-        self.setStyleSheet(f"""
-            QMainWindow {{
-                color: {colors['text']};
-                background-color: {colors['background']};
-            }}
-            
-            QLineEdit {{
-                color: {colors['text']};
-                background-color: {colors['background']};
-            }}
-            
-            QTabBar::tab {{
-                color: {colors['text']};
-                background-color: {colors['surface']};
-            }}
-            
-            QTabBar::tab:selected {{
-                color: {colors['text']};
-                background-color: {colors['background']};
-                border-bottom: 3px solid {colors['primary']};
-            }}
-            
-            QStatusBar {{
-                color: {colors['text']};
-                background-color: {colors['surface']};
-            }}
-            
-            QMenuBar {{
-                color: {colors['text']};
-                background-color: {colors['surface']};
-            }}
-            
-            QMenu {{
-                color: {colors['text']};
-                background-color: {colors['background']};
-            }}
-            
-            QMenu::item {{
-                color: {colors['text']};
-            }}
-            
-            #nav_button {{
-                color: {colors['text']};
-                background-color: transparent;
-            }}
-            
-            #nav_button:hover {{
-                color: {colors['text']};
-                background-color: {colors['surface']};
-            }}
-        """)
         
         self.setup_ui()
         self.setup_connections()

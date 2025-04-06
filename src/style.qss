@@ -1,72 +1,388 @@
-/* Cyberpunk-specific overrides */
+/* Main Window */
 QMainWindow {
-    border: 1px solid rgba(255, 0, 255, 0.2);
-    background-color: #0a0a0f;
+    background-color: #0a0a0a;
+    color: #ffffff;
+    border: 1px solid rgba(255, 0, 255, 0.4);
 }
 
-QTabBar::tab {
-    border: 1px solid rgba(0, 255, 159, 0.3);
-    border-bottom: none;
-    padding: 10px 20px;
-    margin-right: 2px;
-    font-family: Consolas;
-    background: rgba(26, 26, 47, 0.7);
+/* Dialog styling */
+QDialog {
+    background-color: #0a0a0a;
     color: #ffffff;
 }
 
-QTabBar::tab:selected {
-    background: rgba(0, 255, 159, 0.1);
-    border-bottom: 2px solid #00ff9f;
-    color: #00ff9f;
+/* Dialog Specific Styles */
+QDialog[objectName="SettingsDialog"],
+QDialog[objectName="ProxyDialog"],
+QDialog[objectName="CacheSettingsDialog"],
+QDialog[objectName="BookmarksDialog"],
+QDialog[objectName="AddBookmarkDialog"],
+QDialog[objectName="DownloadDialog"] {
+    background-color: #0a0a0a;
+    min-width: 400px;
 }
 
+/* Labels */
+QLabel {
+    color: #ffffff;
+    font-size: 13px;
+}
+
+/* Line Edits */
 QLineEdit {
-    border: 1px solid rgba(0, 255, 255, 0.3);
+    border: 1px solid rgba(0, 255, 255, 0.4);
+    border-radius: 4px;
     padding: 8px;
-    background: rgba(26, 26, 47, 0.7);
+    background: rgba(20, 20, 30, 0.95);
     color: #ffffff;
+    min-height: 25px;
+    selection-background-color: rgba(0, 255, 159, 0.4);
 }
 
 QLineEdit:focus {
     border: 2px solid #00ffff;
-    background: rgba(10, 10, 15, 0.9);
+    background: rgba(25, 25, 35, 0.98);
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
 }
 
+QLineEdit:disabled {
+    background: rgba(26, 26, 47, 0.5);
+    color: rgba(255, 255, 255, 0.5);
+}
+
+/* Combo Boxes */
+QComboBox {
+    border: 1px solid rgba(0, 255, 159, 0.3);
+    border-radius: 4px;
+    padding: 5px;
+    background: rgba(26, 26, 47, 0.8);
+    color: #ffffff;
+    min-height: 25px;
+}
+
+QComboBox:focus {
+    border-color: #00ffff;
+}
+
+QComboBox::drop-down {
+    border: none;
+    width: 20px;
+}
+
+QComboBox::down-arrow {
+    image: url(down_arrow.png);
+    width: 12px;
+    height: 12px;
+}
+
+/* Spin Boxes */
+QSpinBox {
+    border: 1px solid rgba(0, 255, 159, 0.3);
+    border-radius: 4px;
+    padding: 5px;
+    background: rgba(26, 26, 47, 0.8);
+    color: #ffffff;
+    min-height: 25px;
+}
+
+/* Buttons */
 QPushButton {
-    border: 1px solid #00ff9f;
-    background: rgba(26, 26, 47, 0.7);
+    background: rgba(20, 20, 30, 0.95);
     color: #00ff9f;
-    font-weight: bold;
+    border: 1px solid #00ff9f;
+    border-radius: 4px;
     padding: 8px 16px;
+    min-width: 80px;
+    font-weight: bold;
 }
 
 QPushButton:hover {
+    background: rgba(0, 255, 159, 0.25);
+    border-color: #00ffff;
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.4);
+}
+
+QPushButton:pressed {
+    background: rgba(0, 255, 159, 0.3);
+    border-color: #00ffff;
+}
+
+QPushButton[text="Cancel"] {
+    background: transparent;
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+QPushButton[text="Cancel"]:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: #ffffff;
+}
+
+/* Navigation Buttons */
+#nav_button {
+    background: transparent;
+    color: #00ff9f;
+    border: none;
+    border-radius: 4px;
+    min-width: 36px;
+    padding: 8px;
+}
+
+#nav_button:hover {
     background: rgba(0, 255, 159, 0.2);
-    border: 1px solid #00ffff;
+}
+
+/* Download Manager Specific */
+#downloads_button {
+    color: #00ff9f;
+    background: transparent;
+    border: none;
+    border-radius: 4px;
+    min-width: 36px;
+    padding: 8px;
+}
+
+#downloads_button:hover {
+    background: rgba(0, 255, 159, 0.2);
+}
+
+/* Bookmarks Button */
+#bookmarks_button {
+    color: #00ff9f;
+    background: transparent;
+    border: none;
+    border-radius: 4px;
+    min-width: 36px;
+    padding: 8px;
+}
+
+#bookmarks_button:hover {
+    background: rgba(0, 255, 159, 0.2);
+}
+
+/* Tab Widget */
+QTabWidget::pane {
+    border: none;
+    background: rgba(15, 15, 20, 0.95);
+}
+
+QTabBar::tab {
+    border: 1px solid rgba(0, 255, 159, 0.4);
+    border-bottom: none;
+    padding: 10px 20px;
+    margin-right: 2px;
+    background: rgba(20, 20, 30, 0.95);
+    color: #ffffff;
+}
+
+QTabBar::tab:selected {
+    background: rgba(0, 255, 159, 0.15);
+    border: 1px solid #00ff9f;
+    border-bottom: 2px solid #00ff9f;
+    color: #00ff9f;
+}
+
+QTabBar::tab:hover {
+    background: rgba(0, 255, 159, 0.1);
+    border-color: #00ffff;
+}
+
+/* Tab Close Button */
+QTabBar::close-button {
+    image: url(close.png);
+    background: transparent;
+}
+
+QTabBar::close-button:hover {
+    background: rgba(255, 0, 0, 0.2);
+    border-radius: 2px;
+}
+
+/* Status Bar */
+QStatusBar {
+    background: rgba(26, 26, 47, 0.95);
+    color: #ffffff;
+}
+
+/* Status Bar Urgency Levels */
+QStatusBar[urgency="high"] {
+    color: #ff0000;
+}
+
+QStatusBar[urgency="normal"] {
+    color: #ffffff;
+}
+
+QStatusBar[urgency="success"] {
+    color: #00ff9f;
+}
+
+/* Tool Bar */
+QToolBar {
+    background: rgba(26, 26, 47, 0.95);
+    border-bottom: 1px solid rgba(0, 255, 159, 0.3);
+    spacing: 8px;
+    padding: 8px;
+}
+
+QToolBar::separator {
+    width: 1px;
+    background: rgba(0, 255, 159, 0.2);
+    margin: 0 4px;
+}
+
+/* Menu Bar */
+QMenuBar {
+    background: rgba(15, 15, 20, 0.98);
+    color: #ffffff;
 }
 
 QMenu {
-    border: 1px solid rgba(255, 0, 255, 0.3);
-    background: rgba(10, 10, 15, 0.95);
+    background: rgba(10, 10, 15, 0.98);
+    border: 1px solid rgba(255, 0, 255, 0.4);
+    border-radius: 3px;
+    padding: 5px;
 }
 
+QMenu::item {
+    padding: 5px 20px;
+    color: #ffffff;
+}
+
+QMenu::item:selected {
+    background: rgba(0, 255, 159, 0.2);
+    color: #00ff9f;
+}
+
+/* Progress Bar */
+QProgressBar {
+    border: 1px solid rgba(0, 255, 159, 0.3);
+    border-radius: 4px;
+    text-align: center;
+    background: rgba(26, 26, 47, 0.8);
+    height: 20px;
+    color: #ffffff;
+}
+
+QProgressBar::chunk {
+    background: #00ff9f;
+    border-radius: 3px;
+}
+
+/* Download Item Widget */
+#download_item {
+    background: rgba(20, 20, 30, 0.95);
+    border: 1px solid rgba(0, 255, 159, 0.3);
+    border-radius: 4px;
+    padding: 8px;
+    margin: 2px;
+}
+
+#download_item QLabel {
+    color: #ffffff;
+}
+
+#download_item QProgressBar {
+    border: 1px solid rgba(0, 255, 159, 0.3);
+    border-radius: 4px;
+    background: rgba(26, 26, 47, 0.8);
+    height: 20px;
+    text-align: center;
+}
+
+#download_item QProgressBar::chunk {
+    background: #00ff9f;
+    border-radius: 3px;
+}
+
+/* List Widget */
+QListWidget {
+    background: rgba(15, 15, 20, 0.95);
+    border: 1px solid rgba(0, 255, 159, 0.4);
+    border-radius: 4px;
+    color: #ffffff;
+}
+
+QListWidget::item {
+    padding: 8px;
+    border-bottom: 1px solid rgba(0, 255, 159, 0.1);
+}
+
+QListWidget::item:selected {
+    background: rgba(0, 255, 159, 0.15);
+    color: #00ff9f;
+}
+
+QListWidget::item:hover {
+    background: rgba(0, 255, 159, 0.1);
+}
+
+/* Scroll Bar */
 QScrollBar {
-    background: rgba(26, 26, 47, 0.7);
+    background: rgba(26, 26, 47, 0.8);
     width: 12px;
+    border-radius: 6px;
 }
 
 QScrollBar::handle {
     background: #00ff9f;
-    border-radius: 2px;
+    border-radius: 6px;
+    min-height: 30px;
 }
 
 QScrollBar::handle:hover {
     background: #00ffff;
 }
 
-QToolBar {
-    background: rgba(26, 26, 47, 0.9);
-    border-bottom: 1px solid rgba(0, 255, 159, 0.3);
-    spacing: 8px;
+QScrollBar::add-line, QScrollBar::sub-line {
+    height: 0px;
+}
+
+QScrollBar::add-page, QScrollBar::sub-page {
+    background: none;
+}
+
+/* URL Bar */
+#url_bar {
+    background: rgba(20, 20, 30, 0.95);
+    color: #ffffff;
+    border: 1px solid rgba(0, 255, 255, 0.4);
+    border-radius: 4px;
     padding: 8px;
+    min-height: 25px;
+    selection-background-color: rgba(0, 255, 159, 0.4);
+}
+
+#url_bar:focus {
+    border: 2px solid #00ffff;
+    background: rgba(25, 25, 35, 0.98);
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+}
+
+/* Search Bar */
+#search_bar {
+    background: rgba(20, 20, 30, 0.95);
+    color: #ffffff;
+    border: 1px solid rgba(0, 255, 255, 0.4);
+    border-radius: 4px;
+    padding: 8px;
+    min-height: 25px;
+}
+
+#search_bar:focus {
+    border: 2px solid #00ffff;
+    background: rgba(25, 25, 35, 0.98);
+}
+
+/* Error State Styles */
+.error {
+    color: #ff0000;
+}
+
+.warning {
+    color: #ffff00;
+}
+
+.success {
+    color: #00ff9f;
 }

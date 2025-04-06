@@ -8,49 +8,7 @@ class AddBookmarkDialog(QDialog):
         super().__init__(parent)
         self.setWindowTitle("Add Bookmark")
         self.setMinimumWidth(400)
-        
-        # Apply modern style
-        self.setStyleSheet("""
-            QDialog {
-                background-color: #ffffff;
-            }
-            QLabel {
-                color: #444444;
-            }
-            QLineEdit {
-                border: 1px solid #e0e0e0;
-                border-radius: 4px;
-                padding: 5px;
-                background-color: #ffffff;
-                min-height: 25px;
-            }
-            QLineEdit:focus {
-                border-color: #0078d4;
-            }
-            QPushButton {
-                background-color: #0078d4;
-                color: white;
-                border: none;
-                border-radius: 4px;
-                padding: 8px 16px;
-                min-width: 80px;
-            }
-            QPushButton:hover {
-                background-color: #106ebe;
-            }
-            QPushButton:pressed {
-                background-color: #005a9e;
-            }
-            QPushButton[text="Cancel"] {
-                background-color: #ffffff;
-                color: #444444;
-                border: 1px solid #e0e0e0;
-            }
-            QPushButton[text="Cancel"]:hover {
-                background-color: #f8f8f8;
-                border-color: #d0d0d0;
-            }
-        """)
+        self.setObjectName("AddBookmarkDialog")
         
         layout = QFormLayout(self)
         layout.setSpacing(10)
@@ -95,4 +53,4 @@ class AddBookmarkDialog(QDialog):
         bookmarks[title] = url
         settings.setValue("bookmarks", json.dumps(bookmarks))
         
-        return True 
+        return True

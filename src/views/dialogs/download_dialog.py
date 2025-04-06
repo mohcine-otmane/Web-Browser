@@ -9,6 +9,7 @@ class DownloadDialog(QDialog):
         super().__init__(parent)
         self.setWindowTitle("Download")
         self.setMinimumWidth(500)
+        self.setObjectName("DownloadDialog")
         
         # Store URL and parse suggested filename
         self.url = url
@@ -17,85 +18,12 @@ class DownloadDialog(QDialog):
         if not self.suggested_filename:
             self.suggested_filename = "download"
         
-        # Apply modern style
-        self.setStyleSheet("""
-            QDialog {
-                background-color: #ffffff;
-            }
-            QLabel {
-                color: #1e293b;
-                font-size: 13px;
-            }
-            QLineEdit {
-                border: 2px solid #e2e8f0;
-                border-radius: 6px;
-                padding: 8px;
-                background-color: #ffffff;
-                min-height: 36px;
-                font-size: 13px;
-                color: #1e293b;
-            }
-            QLineEdit:focus {
-                border-color: #2563eb;
-            }
-            QLineEdit:disabled {
-                background-color: #f8fafc;
-                color: #64748b;
-            }
-            QProgressBar {
-                border: 1px solid #e2e8f0;
-                border-radius: 4px;
-                text-align: center;
-                background-color: #f8fafc;
-                height: 20px;
-            }
-            QProgressBar::chunk {
-                background-color: #2563eb;
-                border-radius: 3px;
-            }
-            QPushButton {
-                background-color: #2563eb;
-                color: white;
-                border: none;
-                border-radius: 6px;
-                padding: 8px 16px;
-                min-width: 100px;
-                font-size: 13px;
-                font-weight: bold;
-            }
-            QPushButton:hover {
-                background-color: #1d4ed8;
-            }
-            QPushButton:pressed {
-                background-color: #1e40af;
-            }
-            QPushButton[text="Cancel"] {
-                background-color: #ffffff;
-                color: #1e293b;
-                border: 2px solid #e2e8f0;
-            }
-            QPushButton[text="Cancel"]:hover {
-                background-color: #f8fafc;
-                border-color: #cbd5e1;
-            }
-            QPushButton[text="Browse..."] {
-                background-color: #ffffff;
-                color: #2563eb;
-                border: 2px solid #2563eb;
-                min-width: 80px;
-            }
-            QPushButton[text="Browse..."]:hover {
-                background-color: #2563eb10;
-            }
-        """)
-        
         layout = QFormLayout(self)
         layout.setSpacing(16)
         layout.setContentsMargins(24, 24, 24, 24)
         
         # URL
         url_label = QLabel("URL:")
-        url_label.setStyleSheet("font-weight: bold;")
         self.url_edit = QLineEdit()
         self.url_edit.setText(url)
         self.url_edit.setReadOnly(True)
@@ -103,14 +31,12 @@ class DownloadDialog(QDialog):
         
         # Filename
         filename_label = QLabel("Filename:")
-        filename_label.setStyleSheet("font-weight: bold;")
         self.filename_edit = QLineEdit()
         self.filename_edit.setText(self.suggested_filename)
         layout.addRow(filename_label, self.filename_edit)
         
         # Save location
         location_label = QLabel("Save Location:")
-        location_label.setStyleSheet("font-weight: bold;")
         location_layout = QHBoxLayout()
         
         self.location_edit = QLineEdit()
@@ -125,7 +51,6 @@ class DownloadDialog(QDialog):
         
         # Progress bar
         progress_label = QLabel("Progress:")
-        progress_label.setStyleSheet("font-weight: bold;")
         self.progress_bar = QProgressBar()
         self.progress_bar.setRange(0, 100)
         layout.addRow(progress_label, self.progress_bar)
@@ -234,4 +159,4 @@ class DownloadDialog(QDialog):
             save_dir = QStandardPaths.writableLocation(QStandardPaths.DownloadLocation)
         
         filename = self.sanitize_filename(self.filename_edit.text())
-        return os.path.join(save_dir, filename) 
+        return os.path.join(save_dir, filename)

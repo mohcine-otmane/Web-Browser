@@ -8,63 +8,25 @@ class DownloadItemWidget(QWidget):
     def __init__(self, filename, parent=None):
         super().__init__(parent)
         self.filename = filename
+        self.setObjectName("download_item")
         
         layout = QHBoxLayout(self)
         layout.setContentsMargins(4, 4, 4, 4)
         
         # File info
         self.name_label = QLabel(filename)
-        self.name_label.setStyleSheet("""
-            QLabel {
-                color: #1e293b;
-                font-size: 13px;
-            }
-        """)
         
         # Progress bar
         self.progress_bar = QProgressBar()
         self.progress_bar.setRange(0, 100)
         self.progress_bar.setTextVisible(True)
-        self.progress_bar.setStyleSheet("""
-            QProgressBar {
-                border: 1px solid #e2e8f0;
-                border-radius: 4px;
-                text-align: center;
-                background-color: #f8fafc;
-                height: 20px;
-            }
-            QProgressBar::chunk {
-                background-color: #2563eb;
-                border-radius: 3px;
-            }
-        """)
         
         # Status label
         self.status_label = QLabel("Starting...")
-        self.status_label.setStyleSheet("""
-            QLabel {
-                color: #64748b;
-                font-size: 12px;
-                min-width: 80px;
-            }
-        """)
         
         # Cancel button
         self.cancel_button = QPushButton("✕")
         self.cancel_button.setFixedSize(24, 24)
-        self.cancel_button.setStyleSheet("""
-            QPushButton {
-                background-color: transparent;
-                border: none;
-                border-radius: 12px;
-                color: #64748b;
-                font-size: 14px;
-            }
-            QPushButton:hover {
-                background-color: #ef444420;
-                color: #ef4444;
-            }
-        """)
         
         # Add widgets to layout
         layout.addWidget(self.name_label, 2)
@@ -79,47 +41,18 @@ class DownloadItemWidget(QWidget):
         else:
             self.status_label.setText("Completed")
             self.cancel_button.setText("✓")
-            self.cancel_button.setStyleSheet("""
-                QPushButton {
-                    background-color: transparent;
-                    border: none;
-                    border-radius: 12px;
-                    color: #10b981;
-                    font-size: 14px;
-                }
-                QPushButton:hover {
-                    background-color: #10b98120;
-                }
-            """)
     
     def set_status(self, status):
         self.status_label.setText(status)
         if status == "Failed":
-            self.progress_bar.setStyleSheet("""
-                QProgressBar {
-                    border: 1px solid #e2e8f0;
-                    border-radius: 4px;
-                    text-align: center;
-                    background-color: #f8fafc;
-                }
-                QProgressBar::chunk {
-                    background-color: #ef4444;
-                    border-radius: 3px;
-                }
-            """)
-            self.status_label.setStyleSheet("""
-                QLabel {
-                    color: #ef4444;
-                    font-size: 12px;
-                    min-width: 80px;
-                }
-            """)
+            pass
 
 class DownloadManagerDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setWindowTitle("Downloads")
         self.setMinimumSize(600, 400)
+        self.setObjectName("DownloadManagerDialog")
         
         # Store download items
         self.download_items = {}
@@ -134,30 +67,8 @@ class DownloadManagerDialog(QDialog):
         # Header
         header_layout = QHBoxLayout()
         title_label = QLabel("Downloads")
-        title_label.setStyleSheet("""
-            QLabel {
-                color: #1e293b;
-                font-size: 18px;
-                font-weight: bold;
-            }
-        """)
         
         clear_button = QPushButton("Clear Completed")
-        clear_button.setStyleSheet("""
-            QPushButton {
-                background-color: transparent;
-                border: 1px solid #e2e8f0;
-                border-radius: 6px;
-                color: #64748b;
-                padding: 6px 12px;
-                font-size: 13px;
-            }
-            QPushButton:hover {
-                background-color: #f8fafc;
-                border-color: #2563eb;
-                color: #2563eb;
-            }
-        """)
         clear_button.clicked.connect(self.clear_completed)
         
         header_layout.addWidget(title_label)
@@ -172,25 +83,11 @@ class DownloadManagerDialog(QDialog):
         # Add a placeholder message
         self.placeholder = QLabel("No downloads yet")
         self.placeholder.setAlignment(Qt.AlignCenter)
-        self.placeholder.setStyleSheet("""
-            QLabel {
-                color: #64748b;
-                font-size: 14px;
-                padding: 40px;
-            }
-        """)
         self.downloads_layout.addWidget(self.placeholder)
         
-        # Wrap downloads in a widget with proper styling
+        # Wrap downloads in a widget
         downloads_widget = QWidget()
         downloads_widget.setLayout(self.downloads_layout)
-        downloads_widget.setStyleSheet("""
-            QWidget {
-                background-color: #ffffff;
-                border: 1px solid #e2e8f0;
-                border-radius: 8px;
-            }
-        """)
         
         layout.addWidget(downloads_widget)
         
@@ -199,19 +96,6 @@ class DownloadManagerDialog(QDialog):
         button_layout.setSpacing(10)
         
         cancel_all_button = QPushButton("Cancel All")
-        cancel_all_button.setStyleSheet("""
-            QPushButton {
-                background-color: #ffffff;
-                border: 1px solid #ef4444;
-                border-radius: 6px;
-                color: #ef4444;
-                padding: 8px 16px;
-                font-size: 13px;
-            }
-            QPushButton:hover {
-                background-color: #ef444410;
-            }
-        """)
         cancel_all_button.clicked.connect(self.cancel_all)
         
         close_button = QPushButton("Close")
@@ -222,13 +106,6 @@ class DownloadManagerDialog(QDialog):
         button_layout.addWidget(close_button)
         
         layout.addLayout(button_layout)
-        
-        # Apply dialog styling
-        self.setStyleSheet("""
-            QDialog {
-                background-color: #f8fafc;
-            }
-        """)
     
     def add_download(self, download_id, filename):
         """Add a new download to the manager."""
@@ -278,4 +155,4 @@ class DownloadManagerDialog(QDialog):
         """Handle dialog close event."""
         # Hide instead of close to preserve downloads
         self.hide()
-        event.ignore() 
+        event.ignore()

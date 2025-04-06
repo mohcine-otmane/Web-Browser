@@ -1,5 +1,5 @@
 """
-Web Browser Package
+SandFlea Browser Package
 """
 
 from .controllers import BrowserController

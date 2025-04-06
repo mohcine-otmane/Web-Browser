@@ -4,7 +4,6 @@ import logging
 from PySide6.QtWidgets import QApplication
 from PySide6.QtWebEngineCore import QWebEngineProfile
 from PySide6.QtCore import Qt, QCoreApplication
-from qt_material import apply_stylesheet, list_themes
 from controllers.browser_controller import BrowserController
 from views.browser_window import BrowserWindow
 from config.settings import WEBENGINE_FLAGS, ENV_SETTINGS
@@ -36,29 +35,13 @@ def setup_environment():
         "--in-process-gpu"
     )
     
-    # Cyberpunk theme colors
-    extra = {
-        'density_scale': '-2',
-        'accent': '#00ff9f',
-        'primary': '#ff00ff',
-        'secondary': '#00ffff',
-        'warning': '#ffff00',
-        'error': '#ff0000',
-        'font_family': 'Consolas',
-        'font_size': '13px',
-        'border_radius': '2px',
-        'line_height': '20px',
-    }
-    
     # WebEngine setup
     os.environ["QTWEBENGINE_DISABLE_SANDBOX"] = "1"
-    
-    return extra
 
 def main():
     try:
         # Setup environment first - before QApplication
-        extra = setup_environment()
+        setup_environment()
         
         logger.info("Starting browser application...")
         
@@ -66,20 +49,17 @@ def main():
         app = QApplication(sys.argv)
         app.setStyle("Fusion")
         
-        # Load custom stylesheet
+        # Load and apply QSS stylesheet
         try:
-            with open("style.qss", "r") as f:
-                app.setStyleSheet(f.read())
+            style_path = os.path.join(os.path.dirname(__file__), "style.qss")
+            if os.path.exists(style_path):
+                with open(style_path, "r", encoding='utf-8') as f:
+                    app.setStyleSheet(f.read())
+                logger.info("Custom stylesheet loaded successfully")
+            else:
+                logger.error(f"Style file not found: {style_path}")
         except Exception as e:
             logger.error(f"Failed to load stylesheet: {e}")
-        
-        # Apply material theme with cyberpunk customizations
-        apply_stylesheet(
-            app,
-            theme='dark_teal.xml',
-            invert_secondary=True,
-            extra=extra
-        )
         
         app.setQuitOnLastWindowClosed(True)
         
