@@ -381,12 +381,16 @@ QScrollBar::add-page, QScrollBar::sub-page {
     border: 1px solid rgba(255, 0, 0, 0.3);
     padding: 4px 8px;
     border-radius: 4px;
-    transition: all 0.2s ease-in-out;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    text-shadow: 0 0 10px rgba(255, 0, 0, 0.3);
+    box-shadow: 0 0 15px rgba(255, 0, 0, 0.1);
 }
 
 .error:hover {
     background: rgba(255, 0, 0, 0.2);
     border-color: #ff0000;
+    transform: translateY(-1px);
+    box-shadow: 0 5px 15px rgba(255, 0, 0, 0.2);
 }
 
 .warning {
@@ -395,12 +399,16 @@ QScrollBar::add-page, QScrollBar::sub-page {
     border: 1px solid rgba(255, 255, 0, 0.3);
     padding: 4px 8px;
     border-radius: 4px;
-    transition: all 0.2s ease-in-out;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    text-shadow: 0 0 10px rgba(255, 255, 0, 0.3);
+    box-shadow: 0 0 15px rgba(255, 255, 0, 0.1);
 }
 
 .warning:hover {
     background: rgba(255, 255, 0, 0.2);
     border-color: #ffff00;
+    transform: translateY(-1px);
+    box-shadow: 0 5px 15px rgba(255, 255, 0, 0.2);
 }
 
 .success {
@@ -409,12 +417,16 @@ QScrollBar::add-page, QScrollBar::sub-page {
     border: 1px solid rgba(0, 255, 159, 0.3);
     padding: 4px 8px;
     border-radius: 4px;
-    transition: all 0.2s ease-in-out;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    text-shadow: 0 0 10px rgba(0, 255, 159, 0.3);
+    box-shadow: 0 0 15px rgba(0, 255, 159, 0.1);
 }
 
 .success:hover {
     background: rgba(0, 255, 159, 0.2);
     border-color: #00ff9f;
+    transform: translateY(-1px);
+    box-shadow: 0 5px 15px rgba(0, 255, 159, 0.2);
 }
 
 .info {
@@ -423,10 +435,14 @@ QScrollBar::add-page, QScrollBar::sub-page {
     border: 1px solid rgba(0, 255, 255, 0.3);
     padding: 4px 8px;
     border-radius: 4px;
-    transition: all 0.2s ease-in-out;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    text-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.1);
 }
 
 .info:hover {
     background: rgba(0, 255, 255, 0.2);
     border-color: #00ffff;
+    transform: translateY(-1px);
+    box-shadow: 0 5px 15px rgba(0, 255, 255, 0.2);
 }
