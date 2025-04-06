@@ -169,16 +169,65 @@ class BrowserWindow(QMainWindow):
         # Create menus
         self.create_menus()
         
-        # Create toolbar with navigation controls
+        # Create toolbar
         self.toolbar = QToolBar()
         self.toolbar.setMovable(False)
         self.addToolBar(self.toolbar)
         
-        # Create navigation controls
-        self.create_navigation_controls()
+        # Navigation buttons with modern icons
+        back_button = QPushButton("←")
+        back_button.setToolTip("Back")
+        back_button.setFixedSize(32, 32)
+        back_button.clicked.connect(self.controller.back)
         
-        # Create URL bar and related controls
-        self.create_url_controls()
+        forward_button = QPushButton("→")
+        forward_button.setToolTip("Forward")
+        forward_button.setFixedSize(32, 32)
+        forward_button.clicked.connect(self.controller.forward)
+        
+        refresh_button = QPushButton("↻")
+        refresh_button.setToolTip("Refresh")
+        refresh_button.setFixedSize(32, 32)
+        refresh_button.clicked.connect(self.controller.refresh)
+        
+        home_button = QPushButton("⌂")
+        home_button.setToolTip("Home")
+        home_button.setFixedSize(32, 32)
+        home_button.clicked.connect(self.controller.go_home)
+        
+        # URL bar with modern style
+        self.url_bar = QLineEdit()
+        self.url_bar.setPlaceholderText("Enter URL or search term...")
+        self.url_bar.returnPressed.connect(self.handle_url_entered)
+        
+        # Go button
+        go_button = QPushButton("Go")
+        go_button.setFixedSize(32, 32)
+        go_button.clicked.connect(self.handle_url_entered)
+        
+        # Bookmarks button
+        bookmarks_button = QPushButton("★")
+        bookmarks_button.setToolTip("Bookmarks")
+        bookmarks_button.setFixedSize(32, 32)
+        bookmarks_button.clicked.connect(self.controller.show_bookmarks)
+        
+        # Downloads button
+        downloads_button = QPushButton("↓")
+        downloads_button.setToolTip("Downloads")
+        downloads_button.setFixedSize(32, 32)
+        downloads_button.clicked.connect(self.controller.show_download_manager)
+        
+        # Add widgets to toolbar with proper spacing
+        self.toolbar.addWidget(back_button)
+        self.toolbar.addWidget(forward_button)
+        self.toolbar.addWidget(refresh_button)
+        self.toolbar.addWidget(home_button)
+        self.toolbar.addSeparator()
+        self.toolbar.addWidget(self.url_bar)
+        self.toolbar.addWidget(go_button)
+        self.toolbar.addSeparator()
+        self.toolbar.addWidget(bookmarks_button)
+        self.toolbar.addWidget(downloads_button)
         
         # Create tab widget
         self.tab_widget = QTabWidget()
@@ -212,58 +261,6 @@ class BrowserWindow(QMainWindow):
         browser_settings_action.triggered.connect(self.controller.show_settings)
         cache_settings_action.triggered.connect(self.controller.show_cache_settings)
         proxy_settings_action.triggered.connect(self.controller.show_proxy_settings)
-    
-    def create_navigation_controls(self):
-        # Navigation buttons with modern icons
-        back_button = QPushButton("←")
-        back_button.setToolTip("Back")
-        back_button.setFixedSize(32, 32)
-        back_button.clicked.connect(self.controller.back)
-        
-        forward_button = QPushButton("→")
-        forward_button.setToolTip("Forward")
-        forward_button.setFixedSize(32, 32)
-        forward_button.clicked.connect(self.controller.forward)
-        
-        refresh_button = QPushButton("↻")
-        refresh_button.setToolTip("Refresh")
-        refresh_button.setFixedSize(32, 32)
-        refresh_button.clicked.connect(self.controller.refresh)
-        
-        home_button = QPushButton("⌂")
-        home_button.setToolTip("Home")
-        home_button.setFixedSize(32, 32)
-        home_button.clicked.connect(self.controller.go_home)
-        
-        # Add navigation buttons to toolbar
-        self.toolbar.addWidget(back_button)
-        self.toolbar.addWidget(forward_button)
-        self.toolbar.addWidget(refresh_button)
-        self.toolbar.addWidget(home_button)
-        self.toolbar.addSeparator()
-    
-    def create_url_controls(self):
-        # URL bar with modern style
-        self.url_bar = QLineEdit()
-        self.url_bar.setPlaceholderText("Enter URL or search term...")
-        self.url_bar.returnPressed.connect(self.handle_url_entered)
-        
-        # Go button
-        go_button = QPushButton("Go")
-        go_button.setFixedSize(32, 32)
-        go_button.clicked.connect(self.handle_url_entered)
-        
-        # Bookmarks button
-        bookmarks_button = QPushButton("★")
-        bookmarks_button.setToolTip("Bookmarks")
-        bookmarks_button.setFixedSize(32, 32)
-        bookmarks_button.clicked.connect(self.controller.show_bookmarks)
-        
-        # Add URL controls to toolbar
-        self.toolbar.addWidget(self.url_bar)
-        self.toolbar.addWidget(go_button)
-        self.toolbar.addSeparator()
-        self.toolbar.addWidget(bookmarks_button)
     
     def handle_url_entered(self):
         url = self.url_bar.text().strip()

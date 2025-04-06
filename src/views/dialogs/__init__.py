@@ -8,6 +8,7 @@ from .bookmarks_dialog import BookmarksDialog
 from .add_bookmark_dialog import AddBookmarkDialog
 from .download_dialog import DownloadDialog
 from .cache_settings_dialog import CacheSettingsDialog
+from .download_manager_dialog import DownloadManagerDialog
 
 __all__ = [
     'SettingsDialog',
@@ -15,5 +16,6 @@ __all__ = [
     'BookmarksDialog',
     'AddBookmarkDialog',
     'DownloadDialog',
-    'CacheSettingsDialog'
+    'CacheSettingsDialog',
+    'DownloadManagerDialog'
 ] 

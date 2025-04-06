@@ -6,8 +6,11 @@ from PySide6.QtWidgets import (QMessageBox, QDialog, QVBoxLayout, QHBoxLayout,
                              QLineEdit, QListWidget, QListWidgetItem, QPushButton)
 from PySide6.QtWebEngineCore import QWebEngineProfile, QWebEngineDownloadRequest, QWebEnginePage
 from models.browser_model import BrowserModel
-from views.dialogs import SettingsDialog, CacheSettingsDialog, ProxyDialog, BookmarksDialog, AddBookmarkDialog, DownloadDialog
+from views.dialogs import (SettingsDialog, CacheSettingsDialog, ProxyDialog, 
+                         BookmarksDialog, AddBookmarkDialog, DownloadDialog,
+                         DownloadManagerDialog)
 from typing import TYPE_CHECKING
+from .file_downloader import FileDownloader
 
 if TYPE_CHECKING:
     from views.browser_window import BrowserWindow
@@ -20,7 +23,15 @@ class BrowserController(QObject):
         self.view = None  # Will be set after BrowserWindow is created
         self.settings = self.load_settings()
         self.bookmarks = self.load_bookmarks()
-        self.downloads = []
+        
+        # Create file downloader
+        self.downloader = FileDownloader(self)
+        self.downloader.download_progress.connect(self._on_download_progress)
+        self.downloader.download_finished.connect(self._on_download_finished)
+        self.downloader.download_error.connect(self._on_download_error)
+        
+        # Create download manager dialog
+        self.download_manager = None
         
         # Setup cache
         self.setup_cache()
@@ -175,28 +186,88 @@ class BrowserController(QObject):
                     self.bookmarks = self.load_bookmarks()
                     self.view.status_bar.showMessage("Bookmark added!", 3000)
     
+    def show_download_manager(self):
+        """Show the download manager dialog."""
+        if not self.download_manager:
+            self.download_manager = DownloadManagerDialog(self.view)
+        self.download_manager.show()
+    
     def handle_download(self, download: QWebEngineDownloadRequest):
-        dialog = DownloadDialog(download.url().toString(), self.view)
-        if dialog.exec() == QDialog.Accepted:
+        try:
+            # Get the download URL and suggested filename
+            url = download.url().toString()
+            suggested_filename = download.suggestedFileName()
+            if not suggested_filename:
+                suggested_filename = "download"
+            
+            # Create download dialog
+            dialog = DownloadDialog(url, self.view)
+            if dialog.exec() != QDialog.Accepted:
+                download.cancel()
+                return
+            
+            # Get the selected save path
             save_path = dialog.get_save_path()
-            try:
-                # Create directory if it doesn't exist
-                os.makedirs(os.path.dirname(save_path), exist_ok=True)
-                
-                download.setDownloadDirectory(os.path.dirname(save_path))
-                download.setDownloadFileName(os.path.basename(save_path))
-                download.accept()
-                
-                # Connect to the correct signal names in PySide6
-                download.receivedBytesChanged.connect(
-                    lambda: dialog.update_progress(
-                        int((download.receivedBytes() / download.totalBytes()) * 100)
-                    )
-                )
-                download.finished.connect(lambda: self.view.status_bar.showMessage("Download completed", 3000))
-            except Exception as e:
-                QMessageBox.critical(self.view, "Download Error", f"Failed to start download: {str(e)}")
-                self.view.status_bar.showMessage("Download failed", 3000)
+            if not save_path:
+                download.cancel()
+                dialog.close()
+                return
+            
+            # Show download manager if not visible
+            self.show_download_manager()
+            
+            # Add download to manager
+            self.download_manager.add_download(download.id(), os.path.basename(save_path))
+            
+            # Start the download using our FileDownloader
+            self.downloader.start_download(download, save_path, dialog)
+            
+        except Exception as e:
+            error_msg = f"Failed to start download: {str(e)}"
+            QMessageBox.critical(
+                self.view,
+                "Download Error",
+                error_msg
+            )
+            self.view.show_status_message(error_msg)
+            if download:
+                download.cancel()
+            if 'dialog' in locals():
+                dialog.close()
+    
+    def _on_download_progress(self, filename: str, progress: int):
+        """Handle download progress updates."""
+        self.view.show_status_message(f"Downloading {filename}: {progress}%")
+        if self.download_manager:
+            for download_id, info in self.downloader.active_downloads.items():
+                if info['filename'] == filename:
+                    self.download_manager.update_progress(download_id, progress)
+                    break
+    
+    def _on_download_finished(self, filename: str, success: bool):
+        """Handle download completion."""
+        status = "Completed" if success else "Cancelled"
+        self.view.show_status_message(f"Download {status.lower()}: {filename}")
+        if self.download_manager:
+            for download_id, info in self.downloader.active_downloads.items():
+                if info['filename'] == filename:
+                    self.download_manager.update_status(download_id, status)
+                    break
+    
+    def _on_download_error(self, filename: str, error: str):
+        """Handle download errors."""
+        error_msg = f"Download error ({filename}): {error}"
+        self.view.show_status_message(error_msg)
+        QMessageBox.critical(
+            self.view,
+            "Download Error",
+            error_msg
+        )
+        if self.download_manager:
+            for download_id, info in self.downloader.active_downloads.items():
+                if info['filename'] == filename:
+                    self.download_manager.update_status(download_id, "Failed")
+                    break
     
     def get_current_tab(self):
         return self.view.get_current_tab()
