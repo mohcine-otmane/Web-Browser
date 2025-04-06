@@ -377,12 +377,56 @@ QScrollBar::add-page, QScrollBar::sub-page {
 /* Error State Styles */
 .error {
     color: #ff0000;
+    background: rgba(255, 0, 0, 0.1);
+    border: 1px solid rgba(255, 0, 0, 0.3);
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: all 0.2s ease-in-out;
+}
+
+.error:hover {
+    background: rgba(255, 0, 0, 0.2);
+    border-color: #ff0000;
 }
 
 .warning {
     color: #ffff00;
+    background: rgba(255, 255, 0, 0.1);
+    border: 1px solid rgba(255, 255, 0, 0.3);
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: all 0.2s ease-in-out;
+}
+
+.warning:hover {
+    background: rgba(255, 255, 0, 0.2);
+    border-color: #ffff00;
 }
 
 .success {
     color: #00ff9f;
+    background: rgba(0, 255, 159, 0.1);
+    border: 1px solid rgba(0, 255, 159, 0.3);
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: all 0.2s ease-in-out;
+}
+
+.success:hover {
+    background: rgba(0, 255, 159, 0.2);
+    border-color: #00ff9f;
+}
+
+.info {
+    color: #00ffff;
+    background: rgba(0, 255, 255, 0.1);
+    border: 1px solid rgba(0, 255, 255, 0.3);
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: all 0.2s ease-in-out;
+}
+
+.info:hover {
+    background: rgba(0, 255, 255, 0.2);
+    border-color: #00ffff;
 }
